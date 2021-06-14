@@ -11,7 +11,7 @@ app.get('/', (req, res) =>
 })
 
 
-// connecting express to a particular port 
+// connecting express server to a particular port 
 app.listen(process.env.PORT, () =>
 {
     console.log('Server is up and running on port: '+ process.env.PORT)
