@@ -1,76 +1,66 @@
-const express = require('express')
-const mongoose = require('mongoose');
-const app = express()
+const express = require("express");
+const mongoose = require("mongoose");
+const app = express();
 
 // importing model
-const ShortUrl = require('./models/urls');
+const ShortUrl = require("./models/urls");
 
 // to access the environment variables
-require('dotenv').config()
-
+require("dotenv").config();
 
 // fixing views
-app.set('view engine', 'ejs')
-app.use(express.urlencoded({ extended: false }))
+app.set("view engine", "ejs");
+app.use(express.urlencoded({ extended: false }));
 
 // fetching all the shorturls
-app.get('/', async (req, res) =>
-{
-    const allData = await ShortUrl.find()
-    res.render('index', { shortUrls: allData})
-})
+app.get("/", async (req, res) => {
+  const allData = await ShortUrl.find();
+  res.render("index", { shortUrls: allData });
+});
 
 // setting corresponding full url to short
-app.post('/short', async (req, res) =>
-{
-    // parse the full url from the req.body
-    const fullUrl = req.body.fullUrl
+app.post("/short", async (req, res) => {
+  // parse the full url from the req.body
+  const fullUrl = req.body.fullUrl;
 
-    //insert the record using the model
-    const record = new ShortUrl({
-        full:fullUrl
-    })
+  //insert the record using the model
+  const record = new ShortUrl({
+    full: fullUrl,
+  });
 
-    // save the record
-    await record.save()
+  // save the record
+  await record.save();
 
-    // after pushing the data redirect to home
-    res.redirect('/')
-})
+  // after pushing the data redirect to home
+  res.redirect("/");
+});
 
-app.get('/:shortid', async (req, res) =>
-{
-    // grab the :shirtid param
-    const shortid = ''
+app.get("/:shortid", async (req, res) => {
+  // grab the :shirtid param
+  const shortid = "";
 
-    // perform the mongoose call to find the long URL
-    const data = await ShortUrl.findOne({short:shortid})
-	// if null, set status to 404 (res.sendStatus(404))
-    if (!data)
-    {
-        return res.sendStatus(404)
-    }
-	// if not null, increment the click count in database
-    data.clicks++
-    await data.save()
+  // perform the mongoose call to find the long URL
+  const data = await ShortUrl.findOne({ short: shortid });
+  // if null, set status to 404 (res.sendStatus(404))
+  if (!data) {
+    return res.sendStatus(404);
+  }
+  // if not null, increment the click count in database
+  data.clicks++;
+  await data.save();
 
-	// redirect the user to original link
-    res.redirect(data.full)
-})
+  // redirect the user to original link
+  res.redirect(data.full);
+});
 
 // Connected to mongodb
-mongoose.connect(process.env.MONGOURI, {useNewUrlParser: true,useUnifiedTopology: true});
+mongoose.connect(process.env.MONGOURI, {
+  useNewUrlParser: true,
+  useUnifiedTopology: true,
+});
 var db = mongoose.connection;
 
-// wait for mongo connection before server starts
-db.on('open', async () =>
-{
-    // url for testing
-    await ShortUrl.create({ full: 'https://hackodisha.xyz' })
-        
-    // connecting express to a particular port
-    app.listen(process.env.PORT, () =>
-    {
-        console.log('Server is up and running on port: '+ process.env.PORT)
-    })
-})
+// connecting express to a particular port
+app.listen(process.env.PORT, () => {
+  console.log("Server is up and running on port: " + process.env.PORT);
+});
