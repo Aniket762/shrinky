@@ -59,15 +59,11 @@ app.get('/:shortid', async (req, res) =>
 })
 
 // Connected to mongodb
-mongoose.connect('mongodb://localhost:25367', {
-    useNewUrlParser: true,
-    useUnifiedTopology:true
-})
+mongoose.connect(process.env.MONGOURI, {useNewUrlParser: true,useUnifiedTopology: true});
+var db = mongoose.connection;
 
-
-<<<<<<< HEAD
 // wait for mongo connection before server starts
-mongoose.connection.on('open', async () =>
+db.on('open', async () =>
 {
     // url for testing
     await ShortUrl.create({ full: 'https://hackodisha.xyz' })
@@ -77,10 +73,4 @@ mongoose.connection.on('open', async () =>
     {
         console.log('Server is up and running on port: '+ process.env.PORT)
     })
-=======
-// connecting express server to a particular port 
-app.listen(process.env.PORT, () =>
-{
-    console.log('Server is up and running on port: '+ process.env.PORT)
->>>>>>> bff118e607855c93fc69da50a1bdb9b40d21e814
 })
