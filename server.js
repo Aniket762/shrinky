@@ -2,11 +2,18 @@ const express = require("express");
 const mongoose = require("mongoose");
 const app = express();
 
-// importing model
-const ShortUrl = require("./models/urls");
 
 // to access the environment variables
 require("dotenv").config();
+
+// importing routes
+const authRoute = require('./routes/auth');
+
+
+
+// importing model
+const ShortUrl = require("./models/urls");
+
 
 // fixing views
 app.set("view engine", "ejs");
@@ -54,11 +61,21 @@ app.get("/:shortid", async (req, res) => {
 });
 
 // Connected to mongodb
-mongoose.connect(process.env.MONGOURI, {
+mongoose.connect(process.env.MONGOURI,
+  {
   useNewUrlParser: true,
   useUnifiedTopology: true,
-});
+  },
+  ()=>console.log('connected to db')
+);
 var db = mongoose.connection;
+
+
+// Middleware
+app.use(express.json());
+
+// route middlewares
+app.use('/api/user', authRoute);
 
 // connecting express to a particular port
 app.listen(process.env.PORT, () => {
